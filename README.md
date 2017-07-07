@@ -1,2 +1,1 @@
-# anki-loadbalancer
-load balancer addon for anki
+https://ankiweb.net/shared/info/1417170896

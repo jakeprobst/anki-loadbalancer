@@ -87,7 +87,11 @@ def NEW_adjRevIvl(self, card, idealIvl):
         else:
             sibling = False
 
-        cds = self.col.db.all('''select factor from cards where due = ? and queue = 2''', due)
+        # Wether to schedule by each deck load or the load of all the decks
+        if qc["LBDeckScheduling"]:
+            cds = self.col.db.all('''select factor from cards where due = ? and did = ? and queue = 2''', due, card.did)
+        else:
+            cds = self.col.db.all('''select factor from cards where due = ? and queue = 2''', due)
 
         maxdue = max(maxdue, len(cds)*1.0)
         mindue = min(mindue, len(cds)*1.0)
@@ -247,6 +251,15 @@ def NEWsetupUi(self, Preferences):
     self.lbvl.addWidget(self.lbwl2, row, 2)
     row += 1
 
+    otherhead = QtGui.QLabel("<b>Other</b>")
+    self.lbvl.addWidget(otherhead, row, 0, 1, 3)
+    row += 1
+
+    self.lbds = QtGui.QCheckBox("Schedule based on each deck load", self.lbtab)
+    self.lbds.setToolTip("Whether to schedule based on each deck load or the load of all decks.")
+    self.lbvl.addWidget(self.lbds, row, 0)
+    row += 1
+
     spacer = QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
     self.lbvl.addItem(spacer, row, 0)
 
@@ -262,6 +275,7 @@ def NEW__init__(self, mw):
     self.form.lbmina.setValue(qc["LBMinAfter"])
 
     self.form.lbwl.setValue(qc["LBWorkload"]*100)
+    self.form.lbds.setChecked(qc["LBDeckScheduling"])
 
 def NEWaccept(self):
     qc = self.mw.col.conf
@@ -273,6 +287,7 @@ def NEWaccept(self):
     qc["LBMinAfter"]      = self.form.lbmina.value()
 
     qc["LBWorkload"]      = self.form.lbwl.value()/100.0
+    qc["LBDeckScheduling"]      = self.form.lbds.isChecked()
 
 aqt.forms.preferences.Ui_Preferences.setupUi = wrap(aqt.forms.preferences.Ui_Preferences.setupUi, 
                                                     NEWsetupUi, pos="after")
@@ -472,7 +487,8 @@ def InitConf(self):
             "LBMaxAfter": 4,
             "LBMinBefore": 1,
             "LBMinAfter": 1,
-            "LBWorkload": .8
+            "LBWorkload": .8,
+            "LBDeckScheduling": False
             }
 
     for k in keys:

@@ -87,7 +87,7 @@ def NEW_adjRevIvl(self, card, idealIvl):
         else:
             sibling = False
 
-        cds = self.col.db.all('''select factor from cards where due = ? and queue = 2''', due)
+        cds = self.col.db.all('''select factor from cards where due = ? and did = ? and queue = 2''', due, card.did)
 
         maxdue = max(maxdue, len(cds)*1.0)
         mindue = min(mindue, len(cds)*1.0)

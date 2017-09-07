@@ -5,9 +5,9 @@ import aqt.deckconf
 from anki.hooks import wrap
 import anki.stats
 from aqt.qt import *
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 import math
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 dlg = None
 DEBUG = None
@@ -23,8 +23,8 @@ def DebugWindow():
     dlg.setWindowTitle("Load Balancer Debug")
     dlg.resize(643, 580)
 
-    box = QtGui.QVBoxLayout(dlg)
-    txt = QtGui.QPlainTextEdit(dlg)
+    box = QtWidgets.QVBoxLayout(dlg)
+    txt = QtWidgets.QPlainTextEdit(dlg)
     font = QtGui.QFont()
     font.setFamily("Courier")
     txt.setFont(font)
@@ -35,7 +35,7 @@ def DebugWindow():
     DEBUG = txt
     
     debugmenu = QShortcut(QKeySequence("Ctrl+L"), aqt.mw)
-    aqt.mw.connect(debugmenu, SIGNAL("activated()"), lambda: dlg.show())
+    debugmenu.activated.connect(lambda: dlg.show())
 
 
 # the scheduling function
@@ -57,12 +57,12 @@ def NEW_adjRevIvl(self, card, idealIvl):
         ei = nc['ints'][1]
 
         if gi == idealIvl:
-            if nc.has_key("LBGIMinBefore") and -1 not in [nc["LBGIMinBefore"], nc["LBGIMinAfter"]]:
+            if "LBGIMinBefore" in nc and -1 not in [nc["LBGIMinBefore"], nc["LBGIMinAfter"]]:
                 ivlmin = max(nc["LBGIMinBefore"], 1)
                 ivlmax = nc["LBGIMinAfter"]
                 normal = False
         elif ei == idealIvl:
-            if nc.has_key("LBEIMinBefore") and -1 not in [nc["LBEIMinBefore"], nc["LBEIMinAfter"]]:
+            if "LBEIMinBefore" in nc and -1 not in [nc["LBEIMinBefore"], nc["LBEIMinAfter"]]:
                 ivlmin = max(nc["LBEIMinBefore"], 1)
                 ivlmax = nc["LBEIMinAfter"]
                 normal = False
@@ -77,7 +77,7 @@ def NEW_adjRevIvl(self, card, idealIvl):
     maxease = 0.0
     minease = (0xFFFFFFFF)*1.0
     cardsdue = []
-    ivlrange = range(ivlmin, ivlmax+1)
+    ivlrange = list(range(ivlmin, ivlmax+1))
     for i in ivlrange:
         due = self.today + i
         siblings = self.col.db.scalar('''select count() from cards where due = ? and nid = ? and queue = 2''', 
@@ -108,7 +108,7 @@ def NEW_adjRevIvl(self, card, idealIvl):
 
         cardsdue.append([i, len(cds), ease, sibling])
     
-    p(BeautifulSoup(card._getQA()['q']).getText())
+    p(BeautifulSoup(card._getQA()['q'], "lxml").getText())
     lowest = cardsdue[0]
     for c in cardsdue:
         if maxdue == mindue:
@@ -168,82 +168,82 @@ anki.sched.Scheduler._rescheduleAsRev = NEW_rescheduleAsRev
 # preference menu stuff
 
 def NEWsetupUi(self, Preferences):
-    self.lbtab = QtGui.QWidget()
-    self.lbvl = QtGui.QGridLayout(self.lbtab)
+    self.lbtab = QtWidgets.QWidget()
+    self.lbvl = QtWidgets.QGridLayout(self.lbtab)
     self.lbvl.setColumnStretch(0, 0)
     self.lbvl.setColumnStretch(1, 0)
     self.lbvl.setColumnStretch(2, 0)
     self.lbvl.setColumnStretch(3, 1)
 
     row = 0
-    general = QtGui.QLabel("<b>Adjust range</b>")
+    general = QtWidgets.QLabel("<b>Adjust range</b>")
     self.lbvl.addWidget(general, row, 0, 1, 3)
     row += 1
 
-    daybef = QtGui.QLabel("Days before")
+    daybef = QtWidgets.QLabel("Days before")
     daybef.setToolTip("check [interval*percent] days before scheduled day")
-    self.lbperb = QtGui.QSpinBox(self.lbtab)
-    per1 = QtGui.QLabel("percent")
+    self.lbperb = QtWidgets.QSpinBox(self.lbtab)
+    per1 = QtWidgets.QLabel("percent")
     self.lbvl.addWidget(daybef, row, 0)
     self.lbvl.addWidget(self.lbperb, row, 1)
     self.lbvl.addWidget(per1, row, 2)
     row += 1
 
-    dayaft = QtGui.QLabel("Days after")
+    dayaft = QtWidgets.QLabel("Days after")
     dayaft.setToolTip("check [interval*percent] days after scheduled day")
-    self.lbpera = QtGui.QSpinBox(self.lbtab)
-    per2 = QtGui.QLabel("percent")
+    self.lbpera = QtWidgets.QSpinBox(self.lbtab)
+    per2 = QtWidgets.QLabel("percent")
     self.lbvl.addWidget(dayaft, row, 0)
     self.lbvl.addWidget(self.lbpera, row, 1)
     self.lbvl.addWidget(per2, row, 2)
     row += 1
 
-    maxdbe = QtGui.QLabel("Max time before")
+    maxdbe = QtWidgets.QLabel("Max time before")
     maxdbe.setToolTip("Maximum number of days to check before scheduled day")
-    self.lbmaxb = QtGui.QSpinBox(self.lbtab)
-    day1 = QtGui.QLabel("days")
+    self.lbmaxb = QtWidgets.QSpinBox(self.lbtab)
+    day1 = QtWidgets.QLabel("days")
     self.lbvl.addWidget(maxdbe, row, 0)
     self.lbvl.addWidget(self.lbmaxb, row, 1)
     self.lbvl.addWidget(day1, row, 2)
     row += 1
 
-    maxdaf = QtGui.QLabel("Max time after")
+    maxdaf = QtWidgets.QLabel("Max time after")
     maxdaf.setToolTip("Maximum number of days to check after scheduled day")
-    self.lbmaxa = QtGui.QSpinBox(self.lbtab)
-    day2 = QtGui.QLabel("days")
+    self.lbmaxa = QtWidgets.QSpinBox(self.lbtab)
+    day2 = QtWidgets.QLabel("days")
     self.lbvl.addWidget(maxdaf, row, 0)
     self.lbvl.addWidget(self.lbmaxa, row, 1)
     self.lbvl.addWidget(day2, row, 2)
     row += 1
 
-    mindbe = QtGui.QLabel("Min time before")
+    mindbe = QtWidgets.QLabel("Min time before")
     mindbe.setToolTip("Minimum number of days to check before scheduled day")
-    self.lbminb = QtGui.QSpinBox(self.lbtab)
-    day3 = QtGui.QLabel("days")
+    self.lbminb = QtWidgets.QSpinBox(self.lbtab)
+    day3 = QtWidgets.QLabel("days")
     self.lbvl.addWidget(mindbe, row, 0)
     self.lbvl.addWidget(self.lbminb, row, 1)
     self.lbvl.addWidget(day3, row, 2)
     row += 1
 
-    mindaf = QtGui.QLabel("Min time after")
+    mindaf = QtWidgets.QLabel("Min time after")
     mindaf.setToolTip("Minimum number of days to check after scheduled day")
-    self.lbmina = QtGui.QSpinBox(self.lbtab)
-    day4 = QtGui.QLabel("days")
+    self.lbmina = QtWidgets.QSpinBox(self.lbtab)
+    day4 = QtWidgets.QLabel("days")
     self.lbvl.addWidget(mindaf, row, 0)
     self.lbvl.addWidget(self.lbmina, row, 1)
     self.lbvl.addWidget(day4, row, 2)
     row += 1
 
-    easehead = QtGui.QLabel("<b>Ease balancing</b>")
+    easehead = QtWidgets.QLabel("<b>Ease balancing</b>")
     self.lbvl.addWidget(easehead, row, 0, 1, 3)
     row += 1
 
-    wotol = QtGui.QLabel("Workload:Ease")
+    wotol = QtWidgets.QLabel("Workload:Ease")
     wotol.setToolTip("Ratio to value amount due over the average easiness in a day when scheduling.")
-    self.lbwl = QtGui.QSpinBox(self.lbtab)
-    self.lbwl2 = QtGui.QSpinBox(self.lbtab)
-    self.lbwl.connect(self.lbwl, SIGNAL("valueChanged(int)"), lambda k: self.lbwl2.setValue(100-k))
-    self.lbwl2.connect(self.lbwl2, SIGNAL("valueChanged(int)"), lambda k: self.lbwl.setValue(100-k))
+    self.lbwl = QtWidgets.QSpinBox(self.lbtab)
+    self.lbwl2 = QtWidgets.QSpinBox(self.lbtab)
+    self.lbwl.valueChanged[int].connect(lambda k: self.lbwl2.setValue(100-k))
+    self.lbwl2.valueChanged[int].connect(lambda k: self.lbwl.setValue(100-k))
     self.lbwl.setMaximum(100)
     self.lbwl2.setMaximum(100)
     self.lbvl.addWidget(wotol, row, 0)
@@ -251,16 +251,16 @@ def NEWsetupUi(self, Preferences):
     self.lbvl.addWidget(self.lbwl2, row, 2)
     row += 1
 
-    otherhead = QtGui.QLabel("<b>Other</b>")
+    otherhead = QtWidgets.QLabel("<b>Other</b>")
     self.lbvl.addWidget(otherhead, row, 0, 1, 3)
     row += 1
 
-    self.lbds = QtGui.QCheckBox("Schedule based on each deck load", self.lbtab)
+    self.lbds = QtWidgets.QCheckBox("Schedule based on each deck load", self.lbtab)
     self.lbds.setToolTip("Whether to schedule based on each deck load or the load of all decks.")
     self.lbvl.addWidget(self.lbds, row, 0)
     row += 1
 
-    spacer = QtGui.QSpacerItem(1, 1, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+    spacer = QtWidgets.QSpacerItem(1, 1, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
     self.lbvl.addItem(spacer, row, 0)
 
     self.tabWidget.addTab(self.lbtab, "Load Balancer")
@@ -299,53 +299,53 @@ aqt.preferences.Preferences.accept = wrap(aqt.preferences.Preferences.accept, NE
 
 def NEWdconfsetupUi(self, Dialog):
     srow = 7
-    agi = QtGui.QLabel("<b>Load Balance</b>")
+    agi = QtWidgets.QLabel("<b>Load Balance</b>")
     self.gridLayout.addWidget(agi, srow, 0, 1, 3)
     srow += 1
 
-    agi = QtGui.QLabel("<b>&nbsp;&nbsp;&nbsp;&nbsp;Graduating interval</b>")
+    agi = QtWidgets.QLabel("<b>&nbsp;&nbsp;&nbsp;&nbsp;Graduating interval</b>")
     self.gridLayout.addWidget(agi, srow, 0, 1, 3)
     srow += 1
 
-    gimtb = QtGui.QLabel("Minimum")
+    gimtb = QtWidgets.QLabel("Minimum")
     gimtb.setToolTip("Minimum number of days to check after scheduled day\n-1 disables")
-    self.lbgiminb = QtGui.QSpinBox()
+    self.lbgiminb = QtWidgets.QSpinBox()
     self.lbgiminb.setMinimum(-1)
-    day5 = QtGui.QLabel("days")
+    day5 = QtWidgets.QLabel("days")
     self.gridLayout.addWidget(gimtb, srow, 0)
     self.gridLayout.addWidget(self.lbgiminb, srow, 1)
     self.gridLayout.addWidget(day5, srow, 2)
     srow += 1
 
-    gimta = QtGui.QLabel("Maximum")
+    gimta = QtWidgets.QLabel("Maximum")
     gimta.setToolTip("Minimum number of days to check after scheduled day\n-1 disables")
-    self.lbgimina = QtGui.QSpinBox()
+    self.lbgimina = QtWidgets.QSpinBox()
     self.lbgimina.setMinimum(-1)
-    day6 = QtGui.QLabel("days")
+    day6 = QtWidgets.QLabel("days")
     self.gridLayout.addWidget(gimta, srow, 0)
     self.gridLayout.addWidget(self.lbgimina, srow, 1)
     self.gridLayout.addWidget(day6, srow, 2)
     srow += 1
     
-    aei = QtGui.QLabel("<b>&nbsp;&nbsp;&nbsp;&nbsp;Easy interval</b>")
+    aei = QtWidgets.QLabel("<b>&nbsp;&nbsp;&nbsp;&nbsp;Easy interval</b>")
     self.gridLayout.addWidget(aei, srow, 0, 1, 3)
     srow += 1
 
-    eimtb = QtGui.QLabel("Minimum")
+    eimtb = QtWidgets.QLabel("Minimum")
     eimtb.setToolTip("Minimum number of days to check after scheduled day\n-1 disables")
-    self.lbeiminb = QtGui.QSpinBox()
+    self.lbeiminb = QtWidgets.QSpinBox()
     self.lbeiminb.setMinimum(-1)
-    day7 = QtGui.QLabel("days")
+    day7 = QtWidgets.QLabel("days")
     self.gridLayout.addWidget(eimtb, srow, 0)
     self.gridLayout.addWidget(self.lbeiminb, srow, 1)
     self.gridLayout.addWidget(day7, srow, 2)
     srow += 1
 
-    eimta = QtGui.QLabel("Maximum")
+    eimta = QtWidgets.QLabel("Maximum")
     eimta.setToolTip("Minimum number of days to check after scheduled day\n-1 disables")
-    self.lbeimina = QtGui.QSpinBox()
+    self.lbeimina = QtWidgets.QSpinBox()
     self.lbeimina.setMinimum(-1)
-    day8 = QtGui.QLabel("days")
+    day8 = QtWidgets.QLabel("days")
     self.gridLayout.addWidget(eimta, srow, 0)
     self.gridLayout.addWidget(self.lbeimina, srow, 1)
     self.gridLayout.addWidget(day8, srow, 2)
@@ -362,7 +362,7 @@ def NEWloadConf(self):
             "LBEIMinBefore": 4,
             "LBEIMinAfter": 4}
     for k in keys:
-        if not c.has_key(k):
+        if k not in c:
             c[k] = keys[k]
     f.lbgiminb.setValue(c["LBGIMinBefore"])
     f.lbgimina.setValue(c["LBGIMinAfter"])
@@ -492,14 +492,14 @@ def InitConf(self):
             }
 
     for k in keys:
-        if not qc.has_key(k):
+        if k not in qc:
             qc[k] = keys[k]
 
     # cleanup no longer used config options
     delkeys = ["LBShuffle", "LBTolerance", "LBEaseBalance",
                "LBLowPercent"]
     for k in delkeys:
-        if qc.has_key(k):
+        if k in qc:
             del qc[k]
 
     #debugmenu = QShortcut(QKeySequence("Ctrl+L"), self)

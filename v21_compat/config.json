@@ -1,0 +1,10 @@
+{
+  "MaxDaysBefore": 6,
+  "MaxDaysAfter": 4,
+  "MinDaysBefore": 1,
+  "MinDaysAfter": 1,
+  "PercentBefore": 0.1,
+  "PercentAfter": 0.1,
+  "SchedulePerDeck": false,
+  "debugLevel": 0
+}

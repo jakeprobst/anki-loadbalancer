@@ -3,6 +3,7 @@ import aqt
 import aqt.preferences
 import aqt.deckconf
 from anki.hooks import wrap
+from anki.sched import Scheduler
 import anki.stats
 from aqt.qt import *
 from PyQt5 import QtCore, QtGui, QtWidgets

@@ -10,34 +10,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import math
 from bs4 import BeautifulSoup
 
-dlg = None
-DEBUG = None
 def p(s=''):
-    if not DEBUG:
-        DebugWindow()
-    DEBUG.appendPlainText(s)
-
-def DebugWindow():
-    global dlg
-    global DEBUG
-    dlg = QDialog()
-    dlg.setWindowTitle("Load Balancer Debug")
-    dlg.resize(643, 580)
-
-    box = QtWidgets.QVBoxLayout(dlg)
-    txt = QtWidgets.QPlainTextEdit(dlg)
-    font = QtGui.QFont()
-    font.setFamily("Courier")
-    txt.setFont(font)
-    txt.setReadOnly(True)
-
-    box.addWidget(txt)
-
-    DEBUG = txt
-    
-    debugmenu = QShortcut(QKeySequence("Ctrl+L"), aqt.mw)
-    debugmenu.activated.connect(lambda: dlg.show())
-
+    pass
+    #print(s.encode('utf-8'))
 
 # the scheduling function
 
@@ -503,13 +478,7 @@ def InitConf(self):
         if k in qc:
             del qc[k]
 
-    #debugmenu = QShortcut(QKeySequence("Ctrl+L"), self)
-    #aqt.mw.connect(SIGNAL("activated()"), DebugWindow)
-
-
-
-
-anki.collection._Collection.load = wrap(anki.collection._Collection.load, InitConf, pos="after")
+anki.collection._Collection.load = wrap(anki.collection._Collection.__init__, InitConf, pos="after")
 
 
 

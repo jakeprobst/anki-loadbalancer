@@ -509,7 +509,7 @@ def InitConf(self):
 
 
 
-anki.collection._Collection.load = wrap(anki.collection._Collection.load, InitConf, pos="after")
+anki.collection._Collection._loadScheduler = wrap(anki.collection._Collection._loadScheduler, InitConf, pos="before")
 
 
 

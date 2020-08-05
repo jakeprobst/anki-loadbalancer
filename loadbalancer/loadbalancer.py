@@ -455,7 +455,7 @@ anki.stats.CollectionStats.dueGraph = NEWdueGraph
 
 # initialization stuff
 
-def InitConf(self):
+def InitConf(self, *args):
     qc = self.conf
     keys = {"LBPercentBefore": .1, 
             "LBPercentAfter": .1,
@@ -478,7 +478,7 @@ def InitConf(self):
         if k in qc:
             del qc[k]
 
-anki.collection._Collection.load = wrap(anki.collection._Collection.__init__, InitConf, pos="after")
+anki.collection._Collection.__init__ = wrap(anki.collection._Collection.__init__, InitConf, pos="after")
 
 
 

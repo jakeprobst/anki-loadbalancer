@@ -243,14 +243,14 @@ def NEWsetupUi(self, Preferences):
 
 def NEW__init__(self, mw):
     qc = self.mw.col.conf
-    self.form.lbperb.setValue(qc["LBPercentBefore"]*100)
-    self.form.lbpera.setValue(qc["LBPercentAfter"]*100)
-    self.form.lbmaxb.setValue(qc["LBMaxBefore"])
-    self.form.lbmaxa.setValue(qc["LBMaxAfter"])
-    self.form.lbminb.setValue(qc["LBMinBefore"])
-    self.form.lbmina.setValue(qc["LBMinAfter"])
+    self.form.lbperb.setValue(int(qc["LBPercentBefore"]*100))
+    self.form.lbpera.setValue(int(qc["LBPercentAfter"]*100))
+    self.form.lbmaxb.setValue(int(qc["LBMaxBefore"]))
+    self.form.lbmaxa.setValue(int(qc["LBMaxAfter"]))
+    self.form.lbminb.setValue(int(qc["LBMinBefore"]))
+    self.form.lbmina.setValue(int(qc["LBMinAfter"]))
 
-    self.form.lbwl.setValue(qc["LBWorkload"]*100)
+    self.form.lbwl.setValue(int(qc["LBWorkload"]*100))
     self.form.lbds.setChecked(qc["LBDeckScheduling"])
 
 def NEWaccept(self):
